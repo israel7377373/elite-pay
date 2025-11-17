@@ -42,7 +42,7 @@ const Logo = () => (
   </div>
 );
 
-const API_URL = "http://localhost:4000";
+const API_URL = "https://elite-pay-79ex.onrender.com";
 
 
 
@@ -841,7 +841,7 @@ const ReceberPixPage = ({ token, onBack }) => {
     console.log('💰 Valor enviado:', amount);
 
     // ✅ CORRIGIDO - rota correta e porta 4000
-    const response = await fetch('http://localhost:4000/api/transactions/create', {
+    const response = await fetch('https://elite-pay-79ex.onrender.com/api/transactions/create', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
