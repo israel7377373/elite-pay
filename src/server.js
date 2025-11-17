@@ -16,12 +16,34 @@ if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });
 }
 
-// Middleware
-app.use(helmet());
+// ========================================
+// CONFIGURAÇÃO DO CORS (AQUI ESTÁ A MUDANÇA!)
+// ========================================
+// Lista de sites que podem falar com esta API
+const allowedOrigins = [
+  'https://elitepaybr.com',      // Seu site oficial na Hostinger
+  'http://localhost:5173',     // Seu computador para desenvolvimento
+  process.env.FRONTEND_URL     // A variável do .env (para garantir)
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // Permite conexões sem 'origin' (ex: apps de celular, Postman)
+    if (!origin) return callback(null, true);
+
+    // Se a 'origin' da requisição ESTÁ na nossa lista, permite
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      // Se NÃO ESTÁ na lista, bloqueia
+      callback(new Error('CORS: Acesso bloqueado. Origem não permitida.'), false);
+    }
+  },
   credentials: true
 }));
+// ========================================
+
+app.use(helmet());
 app.use(express.json());
 app.use(morgan('combined'));
 
@@ -102,13 +124,18 @@ app.listen(PORT, () => {
   ║                                       ║
   ║  Server: http://localhost:${PORT}        ║
   ║  Health: http://localhost:${PORT}/health ║
-  ║  Auth:   /api/auth/*                  ║
-  ║  Trans:  /api/transactions/*          ║
-  ║  Creds:  /api/credentials/*           ║
+  ║  Auth:   /api/auth/* ║
+  ║  Trans:  /api/transactions/* ║
+  ║  Creds:  /api/credentials/* ║
   ║  Hook:   /webhook/mistic              ║
   ║  Status: ONLINE ✅                    ║
   ╚═══════════════════════════════════════╝
   `);
 });
+
+module.exports = app;
+  `);
+});
+
 
 module.exports = app;
